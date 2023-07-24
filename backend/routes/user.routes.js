@@ -11,13 +11,11 @@ router.post(
         body('email')
             .isEmail()
             .withMessage('Please enter a valid email.')
-            .custom((value, { req }) => {
-                return User.findOne({ where: { email: value } })
-                    .then(userDoc => {
-                        if (userDoc) {
-                            return Promise.reject('E-Mail address already exists!');
-                        }
-                    });
+            .custom(async (value, { req }) => {
+                const user = await User.findOne({ where: { email: value } })
+                if (user) {
+                    return Promise.reject('E-Mail address already exists!');
+                };
             })
             .normalizeEmail(),
         body('password')
@@ -32,13 +30,13 @@ router.post(
     '/signin',
     [
         body('email')
-        .isEmail()
-        .withMessage('Please enter a valid email.'),
+            .isEmail()
+            .withMessage('Please enter a valid email.'),
         body('password')
-        .trim()
-        .not()
-        .isEmpty()
-        .withMessage("Password must not be empty.")
+            .trim()
+            .not()
+            .isEmpty()
+            .withMessage("Password must not be empty.")
     ],
     signin
 );
